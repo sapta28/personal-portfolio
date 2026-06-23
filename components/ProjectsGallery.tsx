@@ -22,9 +22,9 @@ export default function ProjectsGallery({ initialProjects }: ProjectsGalleryProp
   return (
     <div className="space-y-12">
       {/* Filter Buttons */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-slate-900 pb-8">
-        <div className="flex items-center gap-2 text-slate-300 font-medium text-sm">
-          <Filter size={16} className="text-accent" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-slate-200 pb-8">
+        <div className="flex items-center gap-2 text-slate-700 font-medium text-sm">
+          <Filter size={16} className="text-primary" />
           <span>Filter berdasarkan teknologi:</span>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -34,8 +34,8 @@ export default function ProjectsGallery({ initialProjects }: ProjectsGalleryProp
               onClick={() => setSelectedTag(tag)}
               className={`px-4 py-2 text-xs font-semibold rounded-quad transition-all cursor-pointer ${
                 selectedTag === tag
-                  ? 'bg-gradient-to-r from-primary to-accent text-white shadow-md'
-                  : 'glass text-slate-400 hover:text-white hover:border-slate-700'
+                  ? 'bg-primary text-white shadow-sm'
+                  : 'glass text-slate-600 hover:text-primary hover:border-primary/20'
               }`}
             >
               {tag}
@@ -53,7 +53,7 @@ export default function ProjectsGallery({ initialProjects }: ProjectsGalleryProp
         </div>
       ) : (
         <div className="text-center py-20 glass rounded-quad">
-          <p className="text-slate-400 text-sm">Tidak ada proyek yang sesuai dengan teknologi ini.</p>
+          <p className="text-slate-500 text-sm">Tidak ada proyek yang sesuai dengan teknologi ini.</p>
         </div>
       )}
     </div>
