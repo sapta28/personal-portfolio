@@ -35,18 +35,18 @@ interface ProjectCardProps {
 
 export default function ProjectCard({ project }: ProjectCardProps) {
   return (
-    <div className="glass glass-hover rounded-quad overflow-hidden flex flex-col h-full group">
+    <div className="glass glass-hover rounded-quad overflow-hidden flex flex-col h-full group shadow-sm">
       {/* Thumbnail */}
-      <div className="relative aspect-video w-full overflow-hidden bg-slate-950/40">
+      <div className="relative aspect-video w-full overflow-hidden bg-slate-100">
         <img
           src={project.thumbnail_url || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=60'}
           alt={project.title}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
           <Link
             href={`/projects/${project.slug}`}
-            className="flex items-center gap-1.5 px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-quad text-xs font-semibold shadow-lg backdrop-blur-sm transition-transform duration-300"
+            className="flex items-center gap-1.5 px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-quad text-xs font-semibold shadow-lg transition-transform duration-300"
           >
             <span>Lihat Studi Kasus</span>
             <ArrowUpRight size={14} />
@@ -61,35 +61,35 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           {project.tech_stack.slice(0, 3).map((tech) => (
             <span
               key={tech}
-              className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 bg-slate-900 border border-slate-800 text-accent rounded-quad"
+              className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 bg-amber-50 border border-amber-200/50 text-amber-800 rounded-quad"
             >
               {tech}
             </span>
           ))}
           {project.tech_stack.length > 3 && (
-            <span className="text-[10px] font-bold px-2 py-0.5 bg-slate-900 text-slate-400 rounded-quad">
+            <span className="text-[10px] font-bold px-2 py-0.5 bg-slate-100 text-slate-600 rounded-quad">
               +{project.tech_stack.length - 3}
             </span>
           )}
         </div>
 
         {/* Title */}
-        <h3 className="text-lg font-bold text-white mb-2 leading-snug group-hover:text-accent transition-colors line-clamp-1">
+        <h3 className="text-lg font-bold text-slate-800 mb-2 leading-snug group-hover:text-primary transition-colors line-clamp-1">
           <Link href={`/projects/${project.slug}`}>
             {project.title}
           </Link>
         </h3>
 
         {/* Description */}
-        <p className="text-slate-400 text-xs line-clamp-3 leading-relaxed mb-6 flex-grow">
+        <p className="text-slate-600 text-xs line-clamp-3 leading-relaxed mb-6 flex-grow">
           {project.description}
         </p>
 
         {/* Action Links */}
-        <div className="flex items-center justify-between pt-4 border-t border-slate-900">
+        <div className="flex items-center justify-between pt-4 border-t border-slate-100">
           <Link
             href={`/projects/${project.slug}`}
-            className="text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1 transition-colors"
+            className="text-xs font-bold text-slate-700 hover:text-primary flex items-center gap-1 transition-colors"
           >
             Studi Kasus →
           </Link>
@@ -100,7 +100,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                 href={project.github_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-1.5 bg-slate-900/60 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white rounded-quad transition-all"
+                className="p-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 hover:text-primary rounded-quad transition-all"
                 title="Source Code"
               >
                 <GithubIcon size={15} />
@@ -111,7 +111,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                 href={project.live_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-1.5 bg-slate-900/60 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white rounded-quad transition-all"
+                className="p-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 hover:text-primary rounded-quad transition-all"
                 title="Live Demo"
               >
                 <ExternalLink size={15} />
