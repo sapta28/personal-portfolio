@@ -37,24 +37,17 @@ export default function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="mt-auto border-t border-slate-900 bg-[#060a12]/80 backdrop-blur-md">
+    <footer className="mt-auto border-t border-slate-200 bg-white/70 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-6 py-12 md:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 items-center">
+        <div className="flex flex-col md:flex-row gap-8 items-center justify-between">
           {/* Logo & Description */}
           <div className="flex flex-col space-y-3 items-center md:items-start text-center md:text-left">
-            <span className="font-bold text-lg tracking-wider bg-gradient-to-r from-white to-accent bg-clip-text text-transparent">
-              DevPortfol.io
+            <span className="font-bold text-lg tracking-wider bg-gradient-to-r from-slate-900 to-primary bg-clip-text text-transparent">
+              SaptaPortfol.io
             </span>
-            <p className="text-slate-400 text-xs max-w-xs">
+            <p className="text-slate-600 text-xs max-w-xs">
               Membangun solusi perangkat lunak yang andal dengan keahlian fullstack IoT dan aplikasi web modern.
             </p>
-          </div>
-
-          {/* Navigasi Cepat */}
-          <div className="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-400">
-            <Link href="/" className="hover:text-accent transition-colors">Beranda</Link>
-            <Link href="/projects" className="hover:text-accent transition-colors">Proyek</Link>
-            <Link href="/about" className="hover:text-accent transition-colors">Tentang Saya</Link>
           </div>
 
           {/* Social Media & Kontak */}
@@ -64,7 +57,7 @@ export default function Footer() {
                 href="https://github.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2.5 bg-slate-900 border border-slate-800 hover:border-accent hover:text-accent rounded-quad text-slate-400 transition-all"
+                className="p-2.5 bg-slate-50 border border-slate-200 hover:border-primary hover:text-primary rounded-quad text-slate-600 transition-all"
               >
                 <GithubIcon size={18} />
               </a>
@@ -72,13 +65,13 @@ export default function Footer() {
                 href="https://linkedin.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2.5 bg-slate-900 border border-slate-800 hover:border-accent hover:text-accent rounded-quad text-slate-400 transition-all"
+                className="p-2.5 bg-slate-50 border border-slate-200 hover:border-primary hover:text-primary rounded-quad text-slate-600 transition-all"
               >
                 <LinkedinIcon size={18} />
               </a>
               <a
-                href="mailto:contact@example.com"
-                className="p-2.5 bg-slate-900 border border-slate-800 hover:border-accent hover:text-accent rounded-quad text-slate-400 transition-all"
+                href="mailto:saptaadzanipurnama@gmail.com"
+                className="p-2.5 bg-slate-50 border border-slate-200 hover:border-primary hover:text-primary rounded-quad text-slate-600 transition-all"
               >
                 <Mail size={18} />
               </a>
@@ -86,10 +79,10 @@ export default function Footer() {
           </div>
         </div>
 
-        <hr className="border-slate-900 my-8" />
+        <hr className="border-slate-200 my-8" />
 
         <div className="flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
-          <p>© {currentYear} DevPortfol.io. Hak cipta dilindungi.</p>
+          <p>© {currentYear} SaptaPortfol.io. Hak cipta dilindungi.</p>
           <p className="flex items-center gap-1.5">
             Dibuat dengan <Heart size={12} className="text-rose-500 fill-rose-500 animate-pulse" /> menggunakan Next.js & Supabase
           </p>
