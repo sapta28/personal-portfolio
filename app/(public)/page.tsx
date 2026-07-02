@@ -1,8 +1,90 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabaseServer'
 import ProjectCard, { Project } from '@/components/ProjectCard'
-import { ArrowRight, Code, Cpu, Globe, Rocket, Mail } from 'lucide-react'
+import { ArrowRight, Code, Cpu, Globe, Rocket, Mail, Smartphone, Monitor, Target, Link as LinkIcon, Network } from 'lucide-react'
 import TypingEffect from '@/components/TypingEffect'
+
+const IconRenderer = ({ name, size = 24, className }: { name: string; size?: number; className?: string }) => {
+  switch (name.toLowerCase()) {
+    case 'smartphone':
+    case 'phone':
+    case 'mobile':
+      return <Smartphone size={size} className={className} />
+    case 'monitor':
+    case 'web':
+    case 'website':
+    case 'computer':
+      return <Monitor size={size} className={className} />
+    case 'target':
+    case 'logika':
+    case 'precision':
+      return <Target size={size} className={className} />
+    case 'link':
+    case 'integrasi':
+      return <LinkIcon size={size} className={className} />
+    case 'cpu':
+    case 'iot':
+    case 'hardware':
+      return <Cpu size={size} className={className} />
+    case 'network':
+    case 'jaringan':
+    case 'server':
+      return <Network size={size} className={className} />
+    default:
+      return <Cpu size={size} className={className} />
+  }
+}
+
+const MOCK_SERVICES = [
+  {
+    id: 'mock-s1',
+    title: 'Pengembangan Aplikasi Mobile',
+    subtitle: 'Aplikasi mobile yang intuitif, cepat, dan nyaman digunakan.',
+    description: 'Aplikasi mobile yang intuitif, cepat, dan nyaman digunakan.',
+    icon_name: 'smartphone',
+    order_index: 1
+  },
+  {
+    id: 'mock-s2',
+    title: 'Pengembangan Website',
+    subtitle: 'Website responsif dengan performa tinggi dan tampilan modern.',
+    description: 'Website responsif dengan performa tinggi dan tampilan modern.',
+    icon_name: 'monitor',
+    order_index: 2
+  },
+  {
+    id: 'mock-s3',
+    title: 'Implementasi Sistem & Logika',
+    subtitle: 'Sistem yang terstruktur, akurat, dan sesuai kebutuhan bisnis.',
+    description: 'Sistem yang terstruktur, akurat, dan sesuai kebutuhan bisnis.',
+    icon_name: 'target',
+    order_index: 3
+  },
+  {
+    id: 'mock-s4',
+    title: 'Integrasi Ekosistem Digital',
+    subtitle: 'Menghubungkan berbagai platform agar bekerja secara selaras.',
+    description: 'Menghubungkan berbagai platform agar bekerja secara selaras.',
+    icon_name: 'link',
+    order_index: 4
+  },
+  {
+    id: 'mock-s5',
+    title: 'Infrastruktur Perangkat Keras & IoT',
+    subtitle: 'Solusi perangkat keras dan IoT yang efisien dan terintegrasi.',
+    description: 'Solusi perangkat keras dan IoT yang efisien dan terintegrasi.',
+    icon_name: 'cpu',
+    order_index: 5
+  },
+  {
+    id: 'mock-s6',
+    title: 'Pemeliharaan & Konfigurasi Jaringan',
+    subtitle: 'Menjaga stabilitas, keamanan, dan kelancaran komunikasi data.',
+    description: 'Menjaga stabilitas, keamanan, dan kelancaran komunikasi data.',
+    icon_name: 'network',
+    order_index: 6
+  }
+]
 
 const GithubIcon = ({ size = 20 }: { size?: number }) => (
   <svg
@@ -37,14 +119,14 @@ const LinkedinIcon = ({ size = 20 }: { size?: number }) => (
 )
 
 const TechIcon = ({ children, className, label }: { children: React.ReactNode; className: string; label: string }) => (
-  <div 
+  <div
     className={`absolute w-10 h-10 sm:w-12 sm:h-12 glass flex items-center justify-center shadow-md hover:shadow-xl hover:scale-115 hover:border-primary/60 transition-all duration-300 z-20 cursor-pointer group pointer-events-auto ${className}`}
     style={{ borderRadius: '50%' }}
   >
     {/* Bubble Glare reflection */}
-    <div 
-      className="absolute top-[3px] left-[3px] w-2 h-2 sm:w-2.5 sm:h-2.5 bg-white/60 pointer-events-none blur-[0.2px]" 
-      style={{ borderRadius: '50% 35% 50% 40%' }} 
+    <div
+      className="absolute top-[3px] left-[3px] w-2 h-2 sm:w-2.5 sm:h-2.5 bg-white/60 pointer-events-none blur-[0.2px]"
+      style={{ borderRadius: '50% 35% 50% 40%' }}
     />
     {children}
     <span className="absolute bottom-full mb-2 px-2 py-0.5 text-[10px] font-bold text-white bg-slate-800 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-sm z-30">
@@ -92,23 +174,36 @@ const MOCK_PROJECTS: Project[] = [
 
 export default async function HomePage() {
   let featuredProjects: Project[] = []
+  let services: any[] = []
 
   try {
     const supabase = await createClient()
-    const { data, error } = await supabase
+    const { data: projectsData, error: projectsError } = await supabase
       .from('projects')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(3)
 
-    if (!error && data && data.length > 0) {
-      featuredProjects = data as Project[]
+    if (!projectsError && projectsData && projectsData.length > 0) {
+      featuredProjects = projectsData as Project[]
     } else {
       featuredProjects = MOCK_PROJECTS
+    }
+
+    const { data: servicesData, error: servicesError } = await supabase
+      .from('services')
+      .select('*')
+      .order('order_index', { ascending: true })
+
+    if (!servicesError && servicesData && servicesData.length > 0) {
+      services = servicesData
+    } else {
+      services = MOCK_SERVICES
     }
   } catch (err) {
     console.error('Gagal mengambil data dari Supabase:', err)
     featuredProjects = MOCK_PROJECTS
+    services = MOCK_SERVICES
   }
 
   return (
@@ -232,14 +327,14 @@ export default async function HomePage() {
               {/* 2. MySQL */}
               <TechIcon className="top-[30%] right-[-2%] sm:right-[2%] lg:right-[-2%] animate-float-3" label="MySQL">
                 <svg viewBox="0 0 24 24" className="w-5 h-5 sm:w-6 sm:h-6 text-[#4479A1] fill-current">
-                  <path d="M16.405 5.501c-.115 0-.193.014-.274.033v.013h.014c.054.104.146.18.214.273.054.107.1.214.154.32l.014-.015c.094-.066.14-.172.14-.333-.04-.047-.046-.094-.08-.14-.04-.067-.126-.1-.18-.153zM5.77 18.695h-.927a50.854 50.854 0 00-.27-4.41h-.008l-1.41 4.41H2.45l-1.4-4.41h-.01a72.892 72.892 0 00-.195 4.41H0c.055-1.966.192-3.81.41-5.53h1.15l1.335 4.064h.008l1.347-4.064h1.095c.242 2.015.384 3.86.428 5.53zm4.017-4.08c-.378 2.045-.876 3.533-1.492 4.46-.482.716-1.01 1.073-1.583 1.073-.153 0-.34-.046-.566-.138v-.494c.11.017.24.026.386.026.268 0 .483-.075.647-.222.197-.18.295-.382.295-.605 0-.155-.077-.47-.23-.944L6.23 14.615h.91l.727 2.36c.164.536.233.91.205 1.123.4-1.064.678-2.227.835-3.483zm12.325 4.08h-2.63v-5.53h.885v4.85h1.745zm-3.32.135l-1.016-.5c.09-.076.177-.158.255-.25.433-.506.648-1.258.648-2.253 0-1.83-.718-2.746-2.155-2.746-.704 0-1.254.232-1.65.697-.43.508-.646 1.256-.646 2.245 0 .972.19 1.686.574 2.14.35.41.877.615 1.583.615.264 0 .506-.033.725-.098l1.325.772.36-.622zM15.5 17.588c-.225-.36-.337-.94-.337-1.736 0-1.393.424-2.09 1.27-2.09.443 0 .77.167.977.5.224.362.336.936.336 1.723 0 1.404-.424 2.108-1.27 2.108-.445 0-.77-.167-.978-.5zm-1.658-.425c0 .47-.172.856-.516 1.156-.344.3-.803.45-1.384.45-.543 0-1.064-.172-1.573-.515l.237-.476c.438.22.833.328 1.19.328.332 0 .593-.073.783-.22a.754.754 0 00.3-.615c0-.33-.23-.61-.648-.845-.388-.213-1.163-.657-1.163-.657-.422-.307-.632-.636-.632-1.177 0-.45.157-.81.47-1.085.315-.278.72-.415 1.22-.415.512 0 .98.136 1.4.41 l-.213.476a2.726 2.726 0 00-1.064-.23c-.283 0-.502.068-.654.206a.685.685 0 00-.248.524c0 .328.234.61.666.85.393.215 1.187.67 1.187.67.433.305.648.63.648 1.168zm9.382-5.852c-.535-.014-.95.04-1.297.188-.1.04-.26.04-.274.167.055.053.063.14.11.214.08.134.218.313.346.407.14.11.28.216.427.31.26.16.555.255.81.416.145.094.293.213.44.313.073.05.12.14.214.172v-.02c-.046-.06-.06-.147-.105-.214-.067-.067-.134-.127-.2-.193a3.223 3.223 0 00-.695-.675c-.214-.146-.682-.35-.77-.595l-.013-.014c.146-.013.32-.066.46-.106.227-.06.435-.047.67-.106.106-.027.213-.06.32-.094v-.06c-.12-.12-.21-.283-.334-.395a8.867 8.867 0 00-1.104-.823c-.21-.134-.476-.22-.697-.334-.08-.04-.214-.06-.26-.127-.12-.146-.19-.34-.275-.514a17.69 17.69 0 01-.547-1.163c-.12-.262-.193-.523-.34-.763-.69-1.137-1.437-1.826-2.586-2.5-.247-.14-.543-.2-.856-.274-.167-.008-.334-.02-.5-.027-.11-.047-.216-.174-.31-.235-.38-.24-1.364-.76-1.644-.072-.18.434.267.862.422 1.082.115.153.26.328.34.5.047.116.06.235.107.356.106.294.207.622.347.897.073.14.153.287.247.413.054.073.146.107.167.227-.094.136-.1.334-.154.5-.24.757-.146 1.693.194 2.25.107.166.362.534.703.393.3-.12.234-.5.32-.835.02-.08.007-.133.048-.187v.015c.094.188.188.367.274.555.206.328.566.668.867.895.16.12.287.328.487.402v-.02h-.015c-.043-.058-.1-.086-.154-.133a3.445 3.445 0 01-.35-.4 8.76 8.76 0 01-.747-1.218c-.11-.21-.202-.436-.29-.643-.04-.08-.04-.2-.107-.24-.1.146-.247.273-.32.453-.127.288-.14.642-.188 1.01-.027.007-.014 0-.027.014-.214-.052-.287-.274-.367-.46-.2-.475-.233-1.238-.06-1.785.047-.14.247-.582.167-.716-.042-.127-.174-.2-.247-.303a2.478 2.478 0 01-.24-.427c-.16-.374-.24-.788-.414-1.162-.08-.173-.22-.354-.334-.513-.127-.18-.267-.307-.368-.52-.033-.073-.08-.194-.027-.274.014-.054.042-.075.094-.09.088-.072.335.022.422.062.247.1.455.194.662.334.094.066.195.193.315.226h.14c.214.047.455.014.655.073.355.114.675.28.962.46a5.953 5.953 0 012.085 2.286c.08.154.115.295.188.455.14.33.313.663.455.982.14.315.275.636.476.897.1.14.502.213.682.286.133.06.34.115.46.188.23.14.454.3.67.454.11.076.443.243.463.378z"/>
+                  <path d="M16.405 5.501c-.115 0-.193.014-.274.033v.013h.014c.054.104.146.18.214.273.054.107.1.214.154.32l.014-.015c.094-.066.14-.172.14-.333-.04-.047-.046-.094-.08-.14-.04-.067-.126-.1-.18-.153zM5.77 18.695h-.927a50.854 50.854 0 00-.27-4.41h-.008l-1.41 4.41H2.45l-1.4-4.41h-.01a72.892 72.892 0 00-.195 4.41H0c.055-1.966.192-3.81.41-5.53h1.15l1.335 4.064h.008l1.347-4.064h1.095c.242 2.015.384 3.86.428 5.53zm4.017-4.08c-.378 2.045-.876 3.533-1.492 4.46-.482.716-1.01 1.073-1.583 1.073-.153 0-.34-.046-.566-.138v-.494c.11.017.24.026.386.026.268 0 .483-.075.647-.222.197-.18.295-.382.295-.605 0-.155-.077-.47-.23-.944L6.23 14.615h.91l.727 2.36c.164.536.233.91.205 1.123.4-1.064.678-2.227.835-3.483zm12.325 4.08h-2.63v-5.53h.885v4.85h1.745zm-3.32.135l-1.016-.5c.09-.076.177-.158.255-.25.433-.506.648-1.258.648-2.253 0-1.83-.718-2.746-2.155-2.746-.704 0-1.254.232-1.65.697-.43.508-.646 1.256-.646 2.245 0 .972.19 1.686.574 2.14.35.41.877.615 1.583.615.264 0 .506-.033.725-.098l1.325.772.36-.622zM15.5 17.588c-.225-.36-.337-.94-.337-1.736 0-1.393.424-2.09 1.27-2.09.443 0 .77.167.977.5.224.362.336.936.336 1.723 0 1.404-.424 2.108-1.27 2.108-.445 0-.77-.167-.978-.5zm-1.658-.425c0 .47-.172.856-.516 1.156-.344.3-.803.45-1.384.45-.543 0-1.064-.172-1.573-.515l.237-.476c.438.22.833.328 1.19.328.332 0 .593-.073.783-.22a.754.754 0 00.3-.615c0-.33-.23-.61-.648-.845-.388-.213-1.163-.657-1.163-.657-.422-.307-.632-.636-.632-1.177 0-.45.157-.81.47-1.085.315-.278.72-.415 1.22-.415.512 0 .98.136 1.4.41 l-.213.476a2.726 2.726 0 00-1.064-.23c-.283 0-.502.068-.654.206a.685.685 0 00-.248.524c0 .328.234.61.666.85.393.215 1.187.67 1.187.67.433.305.648.63.648 1.168zm9.382-5.852c-.535-.014-.95.04-1.297.188-.1.04-.26.04-.274.167.055.053.063.14.11.214.08.134.218.313.346.407.14.11.28.216.427.31.26.16.555.255.81.416.145.094.293.213.44.313.073.05.12.14.214.172v-.02c-.046-.06-.06-.147-.105-.214-.067-.067-.134-.127-.2-.193a3.223 3.223 0 00-.695-.675c-.214-.146-.682-.35-.77-.595l-.013-.014c.146-.013.32-.066.46-.106.227-.06.435-.047.67-.106.106-.027.213-.06.32-.094v-.06c-.12-.12-.21-.283-.334-.395a8.867 8.867 0 00-1.104-.823c-.21-.134-.476-.22-.697-.334-.08-.04-.214-.06-.26-.127-.12-.146-.19-.34-.275-.514a17.69 17.69 0 01-.547-1.163c-.12-.262-.193-.523-.34-.763-.69-1.137-1.437-1.826-2.586-2.5-.247-.14-.543-.2-.856-.274-.167-.008-.334-.02-.5-.027-.11-.047-.216-.174-.31-.235-.38-.24-1.364-.76-1.644-.072-.18.434.267.862.422 1.082.115.153.26.328.34.5.047.116.06.235.107.356.106.294.207.622.347.897.073.14.153.287.247.413.054.073.146.107.167.227-.094.136-.1.334-.154.5-.24.757-.146 1.693.194 2.25.107.166.362.534.703.393.3-.12.234-.5.32-.835.02-.08.007-.133.048-.187v.015c.094.188.188.367.274.555.206.328.566.668.867.895.16.12.287.328.487.402v-.02h-.015c-.043-.058-.1-.086-.154-.133a3.445 3.445 0 01-.35-.4 8.76 8.76 0 01-.747-1.218c-.11-.21-.202-.436-.29-.643-.04-.08-.04-.2-.107-.24-.1.146-.247.273-.32.453-.127.288-.14.642-.188 1.01-.027.007-.014 0-.027.014-.214-.052-.287-.274-.367-.46-.2-.475-.233-1.238-.06-1.785.047-.14.247-.582.167-.716-.042-.127-.174-.2-.247-.303a2.478 2.478 0 01-.24-.427c-.16-.374-.24-.788-.414-1.162-.08-.173-.22-.354-.334-.513-.127-.18-.267-.307-.368-.52-.033-.073-.08-.194-.027-.274.014-.054.042-.075.094-.09.088-.072.335.022.422.062.247.1.455.194.662.334.094.066.195.193.315.226h.14c.214.047.455.014.655.073.355.114.675.28.962.46a5.953 5.953 0 012.085 2.286c.08.154.115.295.188.455.14.33.313.663.455.982.14.315.275.636.476.897.1.14.502.213.682.286.133.06.34.115.46.188.23.14.454.3.67.454.11.076.443.243.463.378z" />
                 </svg>
               </TechIcon>
 
               {/* 3. Supabase */}
               <TechIcon className="top-[8%] right-[-6%] sm:right-[-2%] lg:right-[-6%] animate-float-2" label="Supabase">
                 <svg viewBox="0 0 24 24" className="w-5 h-5 sm:w-6 sm:h-6 text-[#3ECF8E] fill-current">
-                  <path d="M11.9 1.036c-.015-.986-1.26-1.41-1.874-.637L.764 12.05C-.33 13.427.65 15.455 2.409 15.455h9.579l.113 7.51c.014.985 1.259 1.408 1.873.636l9.262-11.653c1.093-1.375.113-3.403-1.645-3.403h-9.642z"/>
+                  <path d="M11.9 1.036c-.015-.986-1.26-1.41-1.874-.637L.764 12.05C-.33 13.427.65 15.455 2.409 15.455h9.579l.113 7.51c.014.985 1.259 1.408 1.873.636l9.262-11.653c1.093-1.375.113-3.403-1.645-3.403h-9.642z" />
                 </svg>
               </TechIcon>
 
@@ -306,7 +401,7 @@ export default async function HomePage() {
               <TechIcon className="top-[74%] left-[2%] sm:left-[6%] lg:left-[2%] animate-float-3" label="Linux (Ubuntu)">
                 <svg viewBox="0 0 24 24" className="w-5 h-5 sm:w-6 sm:h-6">
                   <circle cx="12" cy="12" r="11" fill="#E95420" />
-                  <path fill="#fff" d="M17.61.455a3.41 3.41 0 0 0-3.41 3.41 3.41 3.41 0 0 0 3.41 3.41 3.41 3.41 0 0 0 3.41-3.41 3.41 3.41 0 0 0-3.41-3.41zM12.92.8C8.923.777 5.137 2.941 3.148 6.451a4.5 4.5 0 0 1 .26-.007 4.92 4.92 0 0 1 2.585.737A8.316 8.316 0 0 1 12.688 3.6 4.944 4.944 0 0 1 13.723.834 11.008 11.008 0 0 0 12.92.8zm9.226 4.994a4.915 4.915 0 0 1-1.918 2.246 8.36 8.36 0 0 1-.273 8.303 4.89 4.89 0 0 1 1.632 2.54 11.156 11.156 0 0 0 .559-13.089zM3.41 7.932A3.41 3.41 0 0 0 0 11.342a3.41 3.41 0 0 0 3.41 3.409 3.41 3.41 0 0 0 3.41-3.41 3.41 3.41 0 0 0-3.41-3.41zm2.027 7.866a4.908 4.908 0 0 1-2.915.358 11.1 11.1 0 0 0 7.991 6.698 11.234 11.234 0 0 0 2.422.249 4.879 4.879 0 0 1-.999-2.85 8.484 8.484 0 0 1-.836-.136 8.304 8.304 0 0 1-5.663-4.32zm11.405.928a3.41 3.41 0 0 0-3.41 3.41 3.41 3.41 0 0 0 3.41 3.41 3.41 3.41 0 0 0 3.41-3.41 3.41 3.41 0 0 0-3.41-3.41z"/>
+                  <path fill="#fff" d="M17.61.455a3.41 3.41 0 0 0-3.41 3.41 3.41 3.41 0 0 0 3.41 3.41 3.41 3.41 0 0 0 3.41-3.41 3.41 3.41 0 0 0-3.41-3.41zM12.92.8C8.923.777 5.137 2.941 3.148 6.451a4.5 4.5 0 0 1 .26-.007 4.92 4.92 0 0 1 2.585.737A8.316 8.316 0 0 1 12.688 3.6 4.944 4.944 0 0 1 13.723.834 11.008 11.008 0 0 0 12.92.8zm9.226 4.994a4.915 4.915 0 0 1-1.918 2.246 8.36 8.36 0 0 1-.273 8.303 4.89 4.89 0 0 1 1.632 2.54 11.156 11.156 0 0 0 .559-13.089zM3.41 7.932A3.41 3.41 0 0 0 0 11.342a3.41 3.41 0 0 0 3.41 3.409 3.41 3.41 0 0 0 3.41-3.41 3.41 3.41 0 0 0-3.41-3.41zm2.027 7.866a4.908 4.908 0 0 1-2.915.358 11.1 11.1 0 0 0 7.991 6.698 11.234 11.234 0 0 0 2.422.249 4.879 4.879 0 0 1-.999-2.85 8.484 8.484 0 0 1-.836-.136 8.304 8.304 0 0 1-5.663-4.32zm11.405.928a3.41 3.41 0 0 0-3.41 3.41 3.41 3.41 0 0 0 3.41 3.41 3.41 3.41 0 0 0 3.41-3.41 3.41 3.41 0 0 0-3.41-3.41z" />
                 </svg>
               </TechIcon>
 
@@ -332,15 +427,15 @@ export default async function HomePage() {
               <TechIcon className="top-[19%] right-[8%] sm:right-[12%] lg:right-[8%] animate-float-4" label="Python">
                 <svg viewBox="0 0 128 128" className="w-5 h-5 sm:w-6 sm:h-6">
                   <linearGradient id="python-grad-a" gradientUnits="userSpaceOnUse" x1="70.252" y1="1237.476" x2="170.659" y2="1151.089" gradientTransform="matrix(.563 0 0 -.568 -29.215 707.817)">
-                    <stop offset="0" stopColor="#5A9FD4"/>
-                    <stop offset="1" stopColor="#306998"/>
+                    <stop offset="0" stopColor="#5A9FD4" />
+                    <stop offset="1" stopColor="#306998" />
                   </linearGradient>
                   <linearGradient id="python-grad-b" gradientUnits="userSpaceOnUse" x1="209.474" y1="1098.811" x2="173.62" y2="1149.537" gradientTransform="matrix(.563 0 0 -.568 -29.215 707.817)">
-                    <stop offset="0" stopColor="#FFD43B"/>
-                    <stop offset="1" stopColor="#FFE873"/>
+                    <stop offset="0" stopColor="#FFD43B" />
+                    <stop offset="1" stopColor="#FFE873" />
                   </linearGradient>
-                  <path fill="url(#python-grad-a)" d="M63.391 1.988c-4.222.02-8.252.379-11.8 1.007-10.45 1.846-12.346 5.71-12.346 12.837v9.411h24.693v3.137H29.977c-7.176 0-13.46 4.313-15.426 12.521-2.268 9.405-2.368 15.275 0 25.096 1.755 7.311 5.947 12.519 13.124 12.519h8.491V67.234c0-8.151 7.051-15.34 15.426-15.34h24.665c6.866 0 12.346-5.654 12.346-12.548V15.833c0-6.693-5.646-11.72-12.346-12.837-4.244-.706-8.645-1.027-12.866-1.008zM50.037 9.557c2.55 0 4.634 2.117 4.634 4.721 0 2.593-2.083 4.69-4.634 4.69-2.56 0-4.633-2.097-4.633-4.69-.001-2.604 2.073-4.721 4.633-4.721z" transform="translate(0 10.26)"/>
-                  <path fill="url(#python-grad-b)" d="M91.682 28.38v10.966c0 8.5-7.208 15.655-15.426 15.655H51.591c-6.756 0-12.346 5.783-12.346 12.549v23.515c0 6.691 5.818 10.628 12.346 12.547 7.816 2.297 15.312 2.713 24.665 0 6.216-1.801 12.346-5.423 12.346-12.547v-9.412H63.938v-3.138h37.012c7.176 0 9.852-5.005 12.348-12.519 2.578-7.735 2.467-15.174 0-25.096-1.774-7.145-5.161-12.521-12.348-12.521h-9.268zM77.809 87.927c2.561 0 4.634 2.097 4.634 4.692 0 2.602-2.074 4.719-4.634 4.719-2.55 0-4.633-2.117-4.633-4.719 0-2.595 2.083-4.692 4.633-4.692z" transform="translate(0 10.26)"/>
+                  <path fill="url(#python-grad-a)" d="M63.391 1.988c-4.222.02-8.252.379-11.8 1.007-10.45 1.846-12.346 5.71-12.346 12.837v9.411h24.693v3.137H29.977c-7.176 0-13.46 4.313-15.426 12.521-2.268 9.405-2.368 15.275 0 25.096 1.755 7.311 5.947 12.519 13.124 12.519h8.491V67.234c0-8.151 7.051-15.34 15.426-15.34h24.665c6.866 0 12.346-5.654 12.346-12.548V15.833c0-6.693-5.646-11.72-12.346-12.837-4.244-.706-8.645-1.027-12.866-1.008zM50.037 9.557c2.55 0 4.634 2.117 4.634 4.721 0 2.593-2.083 4.69-4.634 4.69-2.56 0-4.633-2.097-4.633-4.69-.001-2.604 2.073-4.721 4.633-4.721z" transform="translate(0 10.26)" />
+                  <path fill="url(#python-grad-b)" d="M91.682 28.38v10.966c0 8.5-7.208 15.655-15.426 15.655H51.591c-6.756 0-12.346 5.783-12.346 12.549v23.515c0 6.691 5.818 10.628 12.346 12.547 7.816 2.297 15.312 2.713 24.665 0 6.216-1.801 12.346-5.423 12.346-12.547v-9.412H63.938v-3.138h37.012c7.176 0 9.852-5.005 12.348-12.519 2.578-7.735 2.467-15.174 0-25.096-1.774-7.145-5.161-12.521-12.348-12.521h-9.268zM77.809 87.927c2.561 0 4.634 2.097 4.634 4.692 0 2.602-2.074 4.719-4.634 4.719-2.55 0-4.633-2.117-4.633-4.719 0-2.595 2.083-4.692 4.633-4.692z" transform="translate(0 10.26)" />
                 </svg>
               </TechIcon>
 
@@ -350,57 +445,46 @@ export default async function HomePage() {
       </section>
 
       {/* 2. Keahlian Utama (Expertise) - BG Hitam */}
-      <section className="w-full bg-[#111622] py-20 md:py-28 border-t border-slate-800/50 rounded-t-section relative z-20">
+      <section className="w-full bg-[#0a0f1d] py-24 md:py-32 border-t border-slate-800/50 rounded-t-section relative z-20">
         {/* Subtle background glow effect */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="text-center mb-16">
+          <div className="text-center mb-20">
             <h2 className="text-2xl md:text-4xl font-extrabold text-white mb-4">
-              Spesialisasi & Fokus Teknis
+              Keahlian & Spesialisasi
             </h2>
             <div className="w-12 h-1 bg-primary mx-auto rounded-full mb-4" />
-            <p className="text-slate-400 text-xs sm:text-sm max-w-xl mx-auto">
-              Kombinasi keahlian di dunia perangkat keras dan komputasi awan modern.
+            <p className="text-slate-400 text-xs sm:text-sm max-w-2xl mx-auto leading-relaxed">
+              Saya membantu merancang dan membangun solusi teknologi yang menghubungkan interaksi digital dengan dunia nyata.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Card 1 */}
-            <div className="bg-white/[0.03] border border-white/[0.08] hover:border-primary/40 hover:bg-white/[0.06] p-8 rounded-quad transition-all duration-300 shadow-lg">
-              <div className="p-3 bg-amber-500/10 text-primary w-fit rounded-quad mb-6">
-                <Cpu size={24} />
-              </div>
-              <h3 className="text-lg font-bold text-white mb-3">IoT & Otomasi Hardware</h3>
-              <p className="text-slate-400 text-xs leading-relaxed">
-                Pengembangan firmware mikro (ESP32/Arduino), protokol komunikasi IoT (MQTT, HTTP API), sensor biometrik,
-                dan integrasi kelistrikan (sistem hibrida PLN/PLTS).
-              </p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {services.map((service) => (
+              <div
+                key={service.id}
+                className="bg-[#121622]/80 border border-slate-850 hover:border-amber-500/30 hover:bg-[#161a29] p-8 rounded-2xl transition-all duration-300 shadow-lg relative flex flex-col items-center justify-between group"
+              >
+                <div className="flex flex-col items-center text-center">
+                  {/* Circular Icon Container */}
+                  <div className="w-16 h-16 rounded-full border border-amber-500/25 bg-[#0f121d] flex items-center justify-center mb-6 text-amber-500 group-hover:scale-105 transition-transform duration-300">
+                    <IconRenderer name={service.icon_name} size={26} className="text-amber-500" />
+                  </div>
 
-            {/* Card 2 */}
-            <div className="bg-white/[0.03] border border-white/[0.08] hover:border-primary/40 hover:bg-white/[0.06] p-8 rounded-quad transition-all duration-300 shadow-lg">
-              <div className="p-3 bg-amber-500/10 text-primary w-fit rounded-quad mb-6">
-                <Globe size={24} />
-              </div>
-              <h3 className="text-lg font-bold text-white mb-3">Modern Web Architecture</h3>
-              <p className="text-slate-400 text-xs leading-relaxed">
-                Pembuatan aplikasi web performa tinggi menggunakan Next.js App Router, optimasi rendering (SSR/ISR),
-                dan manajemen basis data modern berskala besar.
-              </p>
-            </div>
+                  <h3 className="text-white font-bold text-base mb-3 group-hover:text-primary transition-colors">
+                    {service.title}
+                  </h3>
 
-            {/* Card 3 */}
-            <div className="bg-white/[0.03] border border-white/[0.08] hover:border-primary/40 hover:bg-white/[0.06] p-8 rounded-quad transition-all duration-300 shadow-lg">
-              <div className="p-3 bg-amber-500/10 text-primary w-fit rounded-quad mb-6">
-                <Code size={24} />
+                  <p className="text-slate-400 text-xs leading-relaxed max-w-[260px]">
+                    {service.description}
+                  </p>
+
+                  {/* Bottom Short Yellow Line */}
+                  <div className="w-8 h-0.5 bg-amber-500/80 mt-6 rounded-full" />
+                </div>
               </div>
-              <h3 className="text-lg font-bold text-white mb-3">Fullstack Database & API</h3>
-              <p className="text-slate-400 text-xs leading-relaxed">
-                Manajemen state, otentikasi aman, pemetaan relasi data, Row Level Security (RLS) di Supabase,
-                serta integrasi backend serverless.
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
