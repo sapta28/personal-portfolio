@@ -1,13 +1,15 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabaseServer'
-import DashboardTable from '@/components/DashboardTable'
+import DashboardView from '@/components/DashboardView'
 import { Project } from '@/components/ProjectCard'
-import { LayoutDashboard, ArrowLeft, Database, Code, Globe, User } from 'lucide-react'
+import { Service } from '@/components/DashboardServicesTable'
+import { LayoutDashboard, ArrowLeft, User } from 'lucide-react'
 
 export const revalidate = 0
 
 export default async function DashboardPage() {
   let projects: Project[] = []
+  let services: Service[] = []
   let userEmail: string | null = null
 
   try {
@@ -18,21 +20,27 @@ export default async function DashboardPage() {
     userEmail = user?.email || 'Admin'
 
     // Ambil data proyek
-    const { data, error } = await supabase
+    const { data: projectsData, error: projectsError } = await supabase
       .from('projects')
       .select('*')
       .order('created_at', { ascending: false })
 
-    if (!error && data) {
-      projects = data as Project[]
+    if (!projectsError && projectsData) {
+      projects = projectsData as Project[]
+    }
+
+    // Ambil data keahlian
+    const { data: servicesData, error: servicesError } = await supabase
+      .from('services')
+      .select('*')
+      .order('order_index', { ascending: true })
+
+    if (!servicesError && servicesData) {
+      services = servicesData as Service[]
     }
   } catch (err) {
     console.error('Gagal mengambil data untuk dashboard:', err)
   }
-
-  // Statistik Ringkas
-  const totalProjects = projects.length
-  const uniqueTechs = Array.from(new Set(projects.flatMap((p) => p.tech_stack))).length
 
   return (
     <div className="min-h-screen bg-[#090d16] text-slate-100 py-12 px-6">
@@ -65,47 +73,8 @@ export default async function DashboardPage() {
           </Link>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          {/* Stat 1 */}
-          <div className="glass p-6 rounded-quad flex items-center gap-4">
-            <div className="p-3 bg-primary/10 text-primary rounded-quad">
-              <Database size={20} />
-            </div>
-            <div>
-              <p className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Total Proyek</p>
-              <h3 className="text-2xl font-black text-white mt-1">{totalProjects}</h3>
-            </div>
-          </div>
-
-          {/* Stat 2 */}
-          <div className="glass p-6 rounded-quad flex items-center gap-4">
-            <div className="p-3 bg-accent/10 text-accent rounded-quad">
-              <Code size={20} />
-            </div>
-            <div>
-              <p className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Teknologi Digunakan</p>
-              <h3 className="text-2xl font-black text-white mt-1">{uniqueTechs}</h3>
-            </div>
-          </div>
-
-          {/* Stat 3 */}
-          <div className="glass p-6 rounded-quad flex items-center gap-4">
-            <div className="p-3 bg-emerald-500/10 text-emerald-400 rounded-quad">
-              <Globe size={20} />
-            </div>
-            <div>
-              <p className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Status Serverless</p>
-              <h3 className="text-sm font-bold text-emerald-400 mt-1.5 flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse" />
-                <span>Supabase Online</span>
-              </h3>
-            </div>
-          </div>
-        </div>
-
-        {/* Table list */}
-        <DashboardTable initialProjects={projects} />
+        {/* Unified Dashboard Tabbed View */}
+        <DashboardView projects={projects} services={services} />
       </div>
     </div>
   )
